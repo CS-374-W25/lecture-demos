@@ -1,0 +1,15 @@
+#!/bin/bash
+
+message1="Hello,"
+message2="World"
+
+printf "%s %.2f\n" "$message1 $message2" 3.14
+
+echo "$PATH"
+
+export PI="3.14159"
+
+echo "$$" # Prints the PID of the running process
+ls jfdsjafdjsafjds
+echo "$?" # Prints the exit code of the previously terminated shell command
+echo "$?" # Prints the exit code of the previously terminated shell command
