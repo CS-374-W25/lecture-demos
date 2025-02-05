@@ -1,0 +1,17 @@
+#!/bin/bash
+
+sometmpfile="$$.tmp.txt"
+echo "Lorem ipsum" > "$sometmpfile"
+
+trap "rm -f $sometmpfile ; exit 1" INT
+
+ctr=2
+while [[ "$ctr" -lt "2000000" ]]
+do
+	echo "$ctr"
+	# Increment ctr by 2
+	# ctr=$(expr "$ctr" + 2)
+	ctr=$((ctr + 2))
+done
+
+rm -f "$sometmpfile"

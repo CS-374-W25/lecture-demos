@@ -1,0 +1,24 @@
+#!/bin/bash
+#
+## ./printfilesindirectory /nfs/stak/users/guyera
+#
+#echo "$#"
+#
+#some_variable=10
+#
+#for i in $1/*
+#do
+#	if [[ -f "$i" ]]
+#	then
+#		echo "$i"
+#	fi
+#done
+
+ctr=2
+while [[ "$ctr" -lt "$1" ]]
+do
+	echo "$ctr"
+	# Increment ctr by 2
+	# ctr=$(expr "$ctr" + 2)
+	ctr=$((ctr + 2))
+done

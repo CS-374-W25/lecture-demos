@@ -1,0 +1,5 @@
+#!/bin/bash -e
+
+cp "my-whole-thesis.txt" "my-new-thesis.txt"
+
+rm -f "my-whole-thesis.txt"

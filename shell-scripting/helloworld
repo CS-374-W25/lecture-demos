@@ -13,3 +13,5 @@ echo "$$" # Prints the PID of the running process
 ls jfdsjafdjsafjds
 echo "$?" # Prints the exit code of the previously terminated shell command
 echo "$?" # Prints the exit code of the previously terminated shell command
+
+
