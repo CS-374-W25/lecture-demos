@@ -63,4 +63,7 @@ int main() {
 	for (i = 0; i < 5; ++i) {
 		pthread_join(worker_threads[i], NULL);
 	}
+
+	pthread_mutex_destroy(&race_started_mutex);
+	pthread_cond_destroy(&race_started_cv);
 }

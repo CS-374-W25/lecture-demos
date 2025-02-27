@@ -1,0 +1,23 @@
+consumer():
+	int prevCounter = 0
+	lock mutex
+	while (counter == prevCounter)
+		wait until we're told to print an update
+	unlock mutex
+
+	lock mutex
+	print the update
+	unlock mutex
+
+main():
+	int my_count = 0;
+	for loop that runs 10 times:
+		lock mutex
+		increment my_count
+		unlock mutex
+		tell the consumer to print
+
+		lock mutex
+		while (consumer is not done)
+			wait until consumer is done printing
+		unlock mutex
