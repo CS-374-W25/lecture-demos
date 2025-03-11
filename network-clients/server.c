@@ -30,9 +30,30 @@ int main() {
 		return 1;
 	}
 
+
+	pid_t child_pids[300];
+	size_t n_child_pids = 0;
 	while (1) {
 		struct sockaddr_in client_addr;
 		socklen_t client_socklen;
+
+		pid_t temp_child_pids[300];
+		size_t n_temp_child_pids = 0;
+		int i;
+		for (i = 0; i < n_child_pids; i++) {
+			int exit_status;
+			int wait_result = waitpid(child_pids[i], &exit_status, WNOHANG);
+			if (!wait_result) {
+				temp_child_pids[n_temp_child_pids] = child_pids[i];
+				n_temp_child_pids++;
+			}
+		}
+
+		for (i = 0; i < n_temp_child_pids; i++) {
+			child_pids[i] = temp_child_pids[i];
+		}
+		n_child_pids = n_temp_child_pids;
+
 		int communication_socket_fd = accept(socket_fd, (struct sockaddr*) &client_addr, &client_socklen);
 
 		pid_t fork_result = fork();
@@ -41,7 +62,7 @@ int main() {
 			// Child does this stuff
 			if (communication_socket_fd == -1) {
 				printf("Error on accept!\n");
-				continue;
+				exit(1);
 			}
 			char message[260] = {'\0'};
 			int max_bytes_to_recv = 260;
@@ -74,8 +95,6 @@ int main() {
 				response = "Sorry! I don't know what that means@@";
 			}
 
-			sleep(1);
-
 			int total_bytes_to_send = strlen(response);
 			int total_bytes_sent = 0;
 			int remaining_bytes_to_send = total_bytes_to_send;
@@ -96,5 +115,9 @@ int main() {
 			close(communication_socket_fd);
 			exit(0);
 		}
+
+		// Parent code
+		child_pids[n_child_pids] = fork_result;
+		n_child_pids++;
 	}
 }
