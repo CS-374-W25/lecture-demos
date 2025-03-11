@@ -34,58 +34,67 @@ int main() {
 		struct sockaddr_in client_addr;
 		socklen_t client_socklen;
 		int communication_socket_fd = accept(socket_fd, (struct sockaddr*) &client_addr, &client_socklen);
-		if (communication_socket_fd == -1) {
-			printf("Error on accept!\n");
-			continue;
-		}
-		char message[260] = {'\0'};
-		int max_bytes_to_recv = 260;
-		int total_bytes_received = 0;
-		int max_remaining_bytes_to_recv = max_bytes_to_recv;
-		while (strstr(message, "@@") == NULL) {
-			int bytes_read = recv(communication_socket_fd, message + total_bytes_received, max_remaining_bytes_to_recv, 0);
-			if (bytes_read > 0) {
-				max_remaining_bytes_to_recv -= bytes_read;
-				total_bytes_received += bytes_read;
-			} else {
-				// Some error occurred
-				return 1;
+
+		pid_t fork_result = fork();
+
+		if (fork_result == 0) {
+			// Child does this stuff
+			if (communication_socket_fd == -1) {
+				printf("Error on accept!\n");
+				continue;
 			}
-		}
-
-		size_t length = strlen(message);
-		message[length - 1] = '\0';
-		message[length - 2] = '\0';
-
-		char* response;
-		if (strcmp(message, "what's your name?") == 0) {
-			// Respond with "My name is ChatBot9000, the world's smartest chatbot!"
-			response = "My name is ChatBot9000, the world's smartest chatbot!@@";
-		} else if (strcmp(message, "open sesame") == 0) {
-			// Respond with "You guessed the secret passphrase! Here, have a cookie :)"
-			response = "You guessed the secret passphrase! Here, have a cookie :)@@";
-		} else {
-			// Respond with "Sorry! I don't know what that means"
-			response = "Sorry! I don't know what that means@@";
-		}
-
-		int total_bytes_to_send = strlen(response);
-		int total_bytes_sent = 0;
-		int remaining_bytes_to_send = total_bytes_to_send;
-
-		while (remaining_bytes_to_send > 0) {
-			int bytes_sent = send(communication_socket_fd, response + total_bytes_sent, remaining_bytes_to_send, 0);
-			if (bytes_sent > 0) {
-				remaining_bytes_to_send -= bytes_sent;
-				total_bytes_sent += bytes_sent;
-			} else {
-				// Some error occurred
-				printf("Error on send!\n");
-				return 1;
+			char message[260] = {'\0'};
+			int max_bytes_to_recv = 260;
+			int total_bytes_received = 0;
+			int max_remaining_bytes_to_recv = max_bytes_to_recv;
+			while (strstr(message, "@@") == NULL) {
+				int bytes_read = recv(communication_socket_fd, message + total_bytes_received, max_remaining_bytes_to_recv, 0);
+				if (bytes_read > 0) {
+					max_remaining_bytes_to_recv -= bytes_read;
+					total_bytes_received += bytes_read;
+				} else {
+					// Some error occurred
+					return 1;
+				}
 			}
-		}
 
-		shutdown(communication_socket_fd, SHUT_RDWR);
-		close(communication_socket_fd);
+			size_t length = strlen(message);
+			message[length - 1] = '\0';
+			message[length - 2] = '\0';
+
+			char* response;
+			if (strcmp(message, "what's your name?") == 0) {
+				// Respond with "My name is ChatBot9000, the world's smartest chatbot!"
+				response = "My name is ChatBot9000, the world's smartest chatbot!@@";
+			} else if (strcmp(message, "open sesame") == 0) {
+				// Respond with "You guessed the secret passphrase! Here, have a cookie :)"
+				response = "You guessed the secret passphrase! Here, have a cookie :)@@";
+			} else {
+				// Respond with "Sorry! I don't know what that means"
+				response = "Sorry! I don't know what that means@@";
+			}
+
+			sleep(1);
+
+			int total_bytes_to_send = strlen(response);
+			int total_bytes_sent = 0;
+			int remaining_bytes_to_send = total_bytes_to_send;
+
+			while (remaining_bytes_to_send > 0) {
+				int bytes_sent = send(communication_socket_fd, response + total_bytes_sent, remaining_bytes_to_send, 0);
+				if (bytes_sent > 0) {
+					remaining_bytes_to_send -= bytes_sent;
+					total_bytes_sent += bytes_sent;
+				} else {
+					// Some error occurred
+					printf("Error on send!\n");
+					return 1;
+				}
+			}
+
+			shutdown(communication_socket_fd, SHUT_RDWR);
+			close(communication_socket_fd);
+			exit(0);
+		}
 	}
 }
