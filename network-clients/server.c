@@ -117,6 +117,11 @@ int main() {
 		}
 
 		// Parent code
+		
+		// Parent closes its copy of the socket as well (but DO NOT
+		// call shutdown() here, or else that will kill the entire
+		// connection, including in the child process)
+		close(communication_socket_fd);
 		child_pids[n_child_pids] = fork_result;
 		n_child_pids++;
 	}
